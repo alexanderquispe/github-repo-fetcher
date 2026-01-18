@@ -37,6 +37,9 @@ Examples:
   # Limit to first 100 users (for testing)
   python fetch_repos.py --location "Peru" --max-users 100 -o peru_test.parquet
 
+  # Resume from a saved users list (skips Step 1)
+  python fetch_repos.py --location "Peru" --users-file peru_users.csv -o peru.parquet
+
   # Fetch by custom query (direct search, not location-based)
   python fetch_repos.py --query "topic:machine-learning stars:>=100" -o ml_repos.parquet
 
@@ -117,6 +120,12 @@ Available filters for --filter:
         action="store_true",
         help="Exclude organizations, only fetch from user accounts"
     )
+    output_group.add_argument(
+        "--users-file",
+        type=str,
+        default=None,
+        help="Load users from a previously saved CSV file (skips Step 1)"
+    )
 
     # Authentication
     auth_group = parser.add_argument_group("Authentication")
@@ -179,6 +188,7 @@ Available filters for --filter:
 
         else:
             # Location-based search (two-step approach)
+            users_file = Path(args.users_file) if args.users_file else None
             fetcher.fetch_by_location_two_step(
                 location=args.location,
                 include_orgs=not args.no_orgs,
@@ -186,7 +196,8 @@ Available filters for --filter:
                 max_users=args.max_users,
                 include_forks=args.include_forks,
                 extra_filter=args.filter,
-                output_path=output_path
+                output_path=output_path,
+                users_file=users_file
             )
 
         # Save output

@@ -558,7 +558,8 @@ class GitHubFetcher:
         max_users: Optional[int] = None,
         include_forks: bool = False,
         extra_filter: str = "",
-        output_path: Optional[Path] = None
+        output_path: Optional[Path] = None,
+        users_file: Optional[Path] = None
     ) -> List[Dict[str, Any]]:
         """
         Fetch all repos from a location using two-step approach:
@@ -573,17 +574,33 @@ class GitHubFetcher:
             include_forks: Include forked repos (default: False)
             extra_filter: Additional GitHub search filters (e.g., "language:Python")
             output_path: Path for saving results
+            users_file: Path to a previously saved users CSV file (skips Step 1)
 
         Returns:
             List of repository data dictionaries
         """
-        # Step 1: Get all users
-        print(f"=== Step 1: Finding users in {location} ===")
-        usernames = self.fetch_users_by_location(location, include_orgs, max_users)
+        # Step 1: Get all users (or load from file)
+        if users_file and users_file.exists():
+            print(f"=== Step 1: Loading users from {users_file} ===")
+            users_df = pd.read_csv(users_file)
+            usernames = users_df['username'].tolist()
+            if max_users:
+                usernames = usernames[:max_users]
+            print(f"Loaded {len(usernames)} users from file")
+        else:
+            print(f"=== Step 1: Finding users in {location} ===")
+            usernames = self.fetch_users_by_location(location, include_orgs, max_users)
 
-        if not usernames:
-            print("No users found!")
-            return []
+            if not usernames:
+                print("No users found!")
+                return []
+
+            # Save user list to separate file
+            if output_path:
+                users_path = output_path.parent / f"{output_path.stem}_users.csv"
+                users_df = pd.DataFrame({'username': usernames})
+                users_df.to_csv(users_path, index=False)
+                print(f"Saved {len(usernames)} users to {users_path}")
 
         # Step 2: Fetch repos for each user
         print(f"\n=== Step 2: Fetching repos for {len(usernames)} users ===")
