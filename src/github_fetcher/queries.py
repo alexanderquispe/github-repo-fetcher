@@ -281,3 +281,40 @@ query GetRepo($owner: String!, $name: String!) {
   }
 }
 """
+
+# Query to fetch commit history for a specific repository (for enrichment)
+REPO_COMMITS_QUERY = """
+query GetRepoCommits($owner: String!, $name: String!, $first: Int!, $after: String) {
+  repository(owner: $owner, name: $name) {
+    defaultBranchRef {
+      target {
+        ... on Commit {
+          history(first: $first, after: $after) {
+            totalCount
+            nodes {
+              oid
+              message
+              committedDate
+              author {
+                name
+                email
+                user {
+                  login
+                }
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      }
+    }
+  }
+  rateLimit {
+    remaining
+    resetAt
+  }
+}
+"""

@@ -16,6 +16,7 @@ A Python tool to efficiently fetch GitHub repository data using the GraphQL API.
 - [Examples](#examples)
 - [Programmatic Usage](#programmatic-usage)
 - [Troubleshooting](#troubleshooting)
+- [AI Coding Tools Data Collection](#ai-coding-tools-data-collection)
 
 ---
 
@@ -564,6 +565,165 @@ GitHub's servers are temporarily overloaded. The tool will retry automatically (
 ### Interrupted? Data lost?
 
 No! Progress is saved every 100 repos. Check the output file - your partial results are there.
+
+---
+
+## AI Coding Tools Data Collection
+
+This repository also includes tools for collecting data about AI coding assistants used across GitHub. We track four major AI coding tools by searching for their unique signatures in commits and pull requests.
+
+### Supported AI Tools
+
+| Tool | Detection Method | Total Found | Unique Repos |
+|------|------------------|-------------|--------------|
+| **Claude Code** | Commits with `Co-Authored-By: *@anthropic.com` | ~7,800,000 commits | 438,979 repos |
+| **OpenAI Codex** | PRs with `head:codex/` branch prefix | 3,094,740 PRs | 248,608 repos |
+| **GitHub Copilot** | PRs with `head:copilot/` branch prefix | 1,082,564 PRs | 246,957 repos |
+| **Google Jules** | Commits by `author:google-labs-jules[bot]` | 622,121 commits | 70,116 repos |
+
+### How Each Tool is Detected
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ Claude Code                                                          │
+│ ─────────────────────────────────────────────────────────────────── │
+│ Search: GitHub Commit Search API                                     │
+│ Query:  "Co-Authored-By" "noreply@anthropic.com"                    │
+│ Example commit trailer:                                              │
+│   Co-Authored-By: Claude <noreply@anthropic.com>                    │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ OpenAI Codex                                                         │
+│ ─────────────────────────────────────────────────────────────────── │
+│ Search: GitHub Issues Search API (is:pr head:codex)                 │
+│ Filter: Branch name starts with "codex/"                            │
+│ Example branches:                                                    │
+│   codex/fix-bug-123                                                  │
+│   codex/add-feature                                                  │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ GitHub Copilot                                                       │
+│ ─────────────────────────────────────────────────────────────────── │
+│ Search: GitHub Issues Search API (is:pr head:copilot)               │
+│ Filter: Branch name starts with "copilot/"                          │
+│ Example branches:                                                    │
+│   copilot/workspace                                                  │
+│   copilot/fix-issue-456                                             │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ Google Jules                                                         │
+│ ─────────────────────────────────────────────────────────────────── │
+│ Search: GitHub Commit Search API                                     │
+│ Query:  author:google-labs-jules[bot]                               │
+│ Note:   Jules creates commits as a GitHub bot account               │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Usage
+
+Each AI tool has a parallel fetcher script that uses multiple GitHub tokens for faster downloading:
+
+```bash
+# Claude Code commits
+python scripts/fetch_claude_parallel.py --dry-run   # Show plan
+python scripts/fetch_claude_parallel.py             # Full download
+
+# OpenAI Codex PRs
+python scripts/fetch_codex_parallel.py --dry-run
+python scripts/fetch_codex_parallel.py
+
+# GitHub Copilot PRs
+python scripts/fetch_copilot_parallel.py --dry-run
+python scripts/fetch_copilot_parallel.py
+
+# Google Jules commits
+python scripts/fetch_jules_parallel.py --dry-run
+python scripts/fetch_jules_parallel.py
+```
+
+### Fetching Repository Metadata
+
+After downloading commits/PRs, you can fetch full repository metadata (33 columns + README) for all unique repositories:
+
+```bash
+# Claude Code repos
+python scripts/fetch_repo_metadata.py
+
+# OpenAI Codex repos
+python scripts/fetch_codex_repo_metadata.py
+
+# GitHub Copilot repos
+python scripts/fetch_copilot_repo_metadata.py
+
+# Google Jules repos
+python scripts/fetch_jules_repo_metadata.py
+```
+
+### Output Files
+
+| Script | Primary Output | Secondary Output |
+|--------|----------------|------------------|
+| `fetch_claude_parallel.py` | `claude_commits_full.parquet` | `claude_repos.csv` |
+| `fetch_codex_parallel.py` | `codex_prs.parquet` | `codex_repos.csv` |
+| `fetch_copilot_parallel.py` | `copilot_prs.parquet` | `copilot_repos.csv` |
+| `fetch_jules_parallel.py` | `jules_commits.parquet` | `jules_repos.csv` |
+| `fetch_*_repo_metadata.py` | `*_repos_metadata.parquet` | - |
+
+### Parallel Worker Configuration
+
+The parallel fetchers use multiple GitHub tokens for speed. Configure tokens in `.env`:
+
+```
+GITHUB_TOKEN_1=ghp_xxx...
+GITHUB_TOKEN_2=ghp_xxx...
+GITHUB_TOKEN_3=ghp_xxx...
+GITHUB_TOKEN_4=ghp_xxx...
+GITHUB_TOKEN_5=ghp_xxx...
+GITHUB_TOKEN_6=ghp_xxx...
+```
+
+Each worker gets assigned a date range balanced by estimated volume to distribute load evenly.
+
+### Data Schema
+
+#### Commits (Claude Code, Jules)
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `sha` | string | Commit SHA |
+| `repo_nwo` | string | owner/repo |
+| `message` | string | Commit message |
+| `author_name` | string | Author name |
+| `author_email` | string | Author email |
+| `author_date` | string | Author timestamp |
+| `committer_name` | string | Committer name |
+| `committer_email` | string | Committer email |
+| `committer_date` | string | Committer timestamp |
+| `html_url` | string | GitHub URL |
+
+#### Pull Requests (Codex, Copilot)
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `pr_id` | int | GitHub PR ID |
+| `pr_number` | int | PR number in repo |
+| `pr_url` | string | GitHub URL |
+| `title` | string | PR title |
+| `state` | string | open/closed |
+| `created_at` | string | Creation timestamp |
+| `merged_at` | string | Merge timestamp |
+| `closed_at` | string | Close timestamp |
+| `user_login` | string | PR author |
+| `repo_nwo` | string | owner/repo |
+| `head_ref` | string | Source branch |
+| `base_ref` | string | Target branch |
+
+#### Repository Metadata (All tools)
+
+Same 33-column schema as the location-based fetcher. See [Output Format](#output-format) above.
 
 ---
 

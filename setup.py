@@ -11,12 +11,12 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 setup(
     name="github-repo-fetcher",
     version="1.0.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Alexander",
+    author_email="alexanderquispe@users.noreply.github.com",
     description="Efficiently fetch GitHub repository data using GraphQL API",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/github-repo-fetcher",
+    url="https://github.com/alexanderquispe/github-repo-fetcher",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     classifiers=[

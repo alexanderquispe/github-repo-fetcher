@@ -32,6 +32,7 @@ env/
 # IDE
 .idea/
 .vscode/
+.claude/
 *.swp
 *.swo
 *~
@@ -40,6 +41,11 @@ env/
 data/output/*.parquet
 data/output/*.csv
 data/output/*.json
+data/output/*.jsonl
+data/output/temp_*/
+
+# BigQuery credentials
+*.json
 
 # Logs
 *.log
