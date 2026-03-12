@@ -10,7 +10,6 @@ from collections import defaultdict
 import time
 
 # GitHub API setup
-TOKEN = "[REDACTED-TOKEN]"
 HEADERS = {
     "Authorization": f"token {TOKEN}",
     "Accept": "application/vnd.github.v3+json"
