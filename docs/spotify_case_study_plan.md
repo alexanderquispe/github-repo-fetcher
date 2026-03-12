@@ -121,6 +121,3 @@ This is very manageable with 1 token (~1 minute of fetching).
 ## Token to Use
 
 New token provided:
-```
-[REDACTED-TOKEN]
-```
