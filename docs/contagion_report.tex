@@ -1,0 +1,289 @@
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% Title
+\title{Peer Influence in AI Coding Tool Adoption:\\A Network Analysis of Claude Code on GitHub}
+\author{Preliminary Report\\[1em]
+\small Prepared for Professor Erik Mazumdar}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report presents preliminary findings on the contagion effects in AI coding tool adoption, specifically analyzing how developers adopt Claude Code through peer influence on GitHub. We constructed a collaboration network of 777,773 developers connected to 3,575 early Claude Code adopters and tracked adoption patterns over a one-month window. Our findings suggest a dose-response relationship: developers with more Claude-using collaborators adopt at higher rates (0.06\% for 1 connection vs. 0.23\% for 10+ connections). While preliminary, these results provide evidence for peer influence in developer tool adoption and outline a methodology for more rigorous causal analysis.
+\end{abstract}
+
+\section{Introduction}
+
+The rapid proliferation of AI-powered coding assistants represents a significant shift in software development practices. Tools such as GitHub Copilot (released 2021), OpenAI Codex (2021), and more recently Claude Code (February 2025) have been adopted by millions of developers worldwide. Understanding how these tools spread through developer communities has implications for both technology diffusion theory and practical tool deployment strategies.
+
+This study investigates whether AI coding tool adoption exhibits \textit{contagion effects}---that is, whether a developer's likelihood of adopting a new tool increases when their collaborators have already adopted it. We focus on Claude Code, Anthropic's command-line AI coding assistant, analyzing adoption patterns through the lens of collaboration networks on GitHub.
+
+\subsection{Research Questions}
+
+\begin{enumerate}
+    \item Do developers who collaborate with Claude Code users adopt Claude at higher rates than expected?
+    \item Is there a dose-response relationship between exposure (number of Claude-using collaborators) and adoption probability?
+    \item What is the typical time lag between exposure and adoption?
+\end{enumerate}
+
+\section{Data Description}
+
+\subsection{Data Sources}
+
+We collected data from GitHub using both the REST API and BigQuery public datasets. Our analysis leverages four primary datasets capturing AI tool usage:
+
+\begin{table}[H]
+\centering
+\caption{AI Tool Usage Datasets}
+\label{tab:datasets}
+\begin{tabular}{lrrll}
+\toprule
+\textbf{Tool} & \textbf{Records} & \textbf{Users} & \textbf{Date Range} & \textbf{Identification} \\
+\midrule
+Claude Code & 281,058 & 8,547 & Feb 2025 -- Jan 2026 & Commit trailer \\
+GitHub Copilot & 1,082,891 & -- & 2022 -- 2025 & PR co-author \\
+OpenAI Codex & 3,094,287 & -- & 2021 -- 2025 & PR co-author \\
+Google Jules & 622,000 & -- & Dec 2024 -- 2025 & Commit email \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Tool Identification Methods}
+
+Each AI coding tool leaves distinct traces in version control:
+
+\begin{itemize}
+    \item \textbf{Claude Code}: Identified via commit trailers containing \texttt{Claude-Code} or author patterns matching \texttt{claude@anthropic.com}
+    \item \textbf{GitHub Copilot}: Identified via pull request co-author fields containing \texttt{copilot}
+    \item \textbf{OpenAI Codex}: Identified via pull request metadata referencing Codex
+    \item \textbf{Google Jules}: Identified via committer email \texttt{jules@google.com}
+\end{itemize}
+
+\subsection{Key Dates}
+
+\begin{itemize}
+    \item \textbf{Claude Code Release}: February 2025 (preview), May 2025 (general availability)
+    \item \textbf{Snapshot Date}: May 31, 2025 (identify early adopters)
+    \item \textbf{Outcome Date}: June 30, 2025 (measure subsequent adoption)
+\end{itemize}
+
+\section{Methodology}
+
+Our analysis proceeded in four stages, designed to identify Claude Code users, map their collaboration networks, and measure adoption among collaborators.
+
+\subsection{Stage 1: Identify Early Claude Adopters}
+
+We identified all GitHub users who had committed code using Claude Code by May 31, 2025. This was done by parsing the \texttt{claude\_commits.parquet} dataset and filtering by \texttt{committed\_date}.
+
+\begin{equation}
+\text{EarlyAdopters} = \{u : \exists \text{ commit by } u \text{ with Claude Code before May 31, 2025}\}
+\end{equation}
+
+\textbf{Result}: 3,575 unique users identified as Claude Code early adopters.
+
+\subsection{Stage 2: Fetch User Repositories}
+
+For each early adopter, we fetched all repositories they had contributed to using the GitHub REST API:
+
+\begin{verbatim}
+GET /users/{username}/repos
+GET /users/{username}/events (for contribution activity)
+\end{verbatim}
+
+This process was parallelized across 6 GitHub API tokens to respect rate limits (5,000 requests/hour/token).
+
+\textbf{Result}: 219,285 repository associations across 214,605 unique repositories.
+
+\subsection{Stage 3: Fetch Repository Contributors}
+
+For each unique repository, we fetched the contributor list:
+
+\begin{verbatim}
+GET /repos/{owner}/{repo}/contributors
+\end{verbatim}
+
+This stage required fetching contributors for 214,605 repositories, parallelized across 6 workers. The process took approximately 8 hours.
+
+\textbf{Result}: 4,331,654 contributor records representing 779,827 unique developers across 202,424 repositories (some repositories were private, deleted, or inaccessible).
+
+\subsection{Stage 4: Contagion Analysis}
+
+We constructed the collaboration network and analyzed adoption patterns:
+
+\begin{enumerate}
+    \item \textbf{Define exposed population}: Developers who share at least one repository with an early Claude adopter (and were not themselves early adopters)
+    \item \textbf{Measure exposure level}: Count of distinct Claude-using collaborators for each exposed developer
+    \item \textbf{Measure adoption}: Whether the exposed developer used Claude Code by June 30, 2025
+    \item \textbf{Compute adoption rates}: By exposure level
+\end{enumerate}
+
+\section{Results}
+
+\subsection{Summary Statistics}
+
+\begin{table}[H]
+\centering
+\caption{Contagion Analysis Summary}
+\label{tab:summary}
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Claude users (May 2025) & 3,575 \\
+Claude users (June 2025) & 6,413 \\
+New adopters (June 2025) & 2,838 \\
+\midrule
+Total collaborators of Claude users & 777,773 \\
+Exposed collaborators (not already users) & 776,336 \\
+Exposed who adopted Claude & 877 \\
+\textbf{Adoption rate (exposed)} & \textbf{0.11\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Dose-Response Relationship}
+
+We find a positive relationship between exposure level (number of Claude-using collaborators) and adoption probability:
+
+\begin{table}[H]
+\centering
+\caption{Adoption Rate by Exposure Level}
+\label{tab:exposure}
+\begin{tabular}{rrrr}
+\toprule
+\textbf{Exposure Level} & \textbf{Collaborators} & \textbf{Adopted} & \textbf{Rate} \\
+\midrule
+1 & 335,700 & 191 & 0.06\% \\
+2 & 127,571 & 97 & 0.08\% \\
+3 & 72,064 & 65 & 0.09\% \\
+4 & 46,491 & 41 & 0.09\% \\
+5 & 33,995 & 58 & 0.17\% \\
+6 & 24,389 & 31 & 0.13\% \\
+7 & 18,735 & 30 & 0.16\% \\
+8 & 14,366 & 21 & 0.15\% \\
+9 & 11,984 & 27 & 0.23\% \\
+10+ & 9,800 & 23 & 0.23\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The adoption rate increases approximately 4-fold from 0.06\% (single connection) to 0.23\% (10+ connections), suggesting a dose-response relationship consistent with peer influence.
+
+\subsection{Time to Adoption}
+
+For the 877 exposed collaborators who adopted Claude Code, we analyzed the time gap between their first Claude-using collaborator's adoption and their own adoption:
+
+\begin{table}[H]
+\centering
+\caption{Time to Adoption Statistics}
+\label{tab:timing}
+\begin{tabular}{lr}
+\toprule
+\textbf{Statistic} & \textbf{Days} \\
+\midrule
+Mean & 92.4 \\
+Median & 100.0 \\
+Minimum & 3 \\
+Maximum & 126 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The median adoption lag of 100 days suggests that peer influence, if present, operates over a multi-month timescale rather than immediate adoption.
+
+\section{Interpretation and Limitations}
+
+\subsection{Evidence for Peer Influence}
+
+The dose-response relationship (Table \ref{tab:exposure}) is suggestive of peer influence: developers with more Claude-using collaborators are more likely to adopt Claude themselves. However, several alternative explanations must be considered:
+
+\begin{enumerate}
+    \item \textbf{Homophily}: Developers who adopt new tools may preferentially collaborate with similar early-adopter types
+    \item \textbf{Confounding by activity}: Highly active developers may both collaborate more and adopt tools faster
+    \item \textbf{Domain effects}: Certain programming domains (e.g., AI/ML) may drive both collaboration patterns and tool adoption
+\end{enumerate}
+
+\subsection{Limitations}
+
+\begin{enumerate}
+    \item \textbf{No control group}: We lack a baseline adoption rate among unexposed developers, making it impossible to quantify the ``treatment effect'' of exposure
+
+    \item \textbf{No statistical significance tests}: The observed dose-response relationship has not been tested for statistical significance
+
+    \item \textbf{Confounders not controlled}: We do not control for developer activity level, experience, or programming language
+
+    \item \textbf{Selection bias}: We only observe public GitHub activity; private repositories and enterprise usage are not captured
+
+    \item \textbf{Single tool, single platform}: Results may not generalize to other tools or platforms
+\end{enumerate}
+
+\section{Next Steps}
+
+To strengthen these findings for publication, we propose:
+
+\subsection{Immediate Improvements}
+
+\begin{enumerate}
+    \item \textbf{Construct control group}: Sample random GitHub developers not connected to Claude users and measure their adoption rate as baseline
+
+    \item \textbf{Statistical testing}:
+    \begin{itemize}
+        \item Chi-square test for exposed vs. unexposed adoption rates
+        \item Logistic regression: $\text{logit}(P(\text{Adopt})) = \beta_0 + \beta_1 \cdot \text{Exposure} + \mathbf{X}\boldsymbol{\gamma}$
+        \item Confidence intervals for dose-response curve
+    \end{itemize}
+
+    \item \textbf{Control for confounders}: Fetch and include user activity metrics, account age, primary language
+\end{enumerate}
+
+\subsection{Robustness Checks}
+
+\begin{enumerate}
+    \item Different time windows (April$\to$May, May$\to$July)
+    \item Placebo test: Do collaborators of Claude users adopt \textit{unrelated} tools at elevated rates? (Should be no)
+    \item Alternative exposure definitions (weighted by collaboration intensity)
+\end{enumerate}
+
+\subsection{Extended Analysis}
+
+\begin{enumerate}
+    \item Cascade detection: Identify chains of sequential adoption
+    \item Network position effects: Do central developers spread adoption faster?
+    \item Cross-tool dynamics: Do Copilot/Codex users switch to Claude at different rates?
+\end{enumerate}
+
+\section{Conclusion}
+
+This preliminary analysis provides suggestive evidence for peer influence in AI coding tool adoption. Among 776,336 developers who collaborated with early Claude Code adopters, those with more Claude-using connections adopted at higher rates (0.06\% to 0.23\%). While these findings are consistent with contagion effects, establishing causality requires additional work: constructing a control group, controlling for confounders, and conducting statistical significance tests.
+
+The methodology developed here---identifying tool users from version control metadata, constructing collaboration networks via API, and measuring adoption cascades---provides a foundation for more rigorous analysis. With the proposed improvements, this work could contribute to our understanding of how developer tools spread through professional networks.
+
+\section*{Data and Code Availability}
+
+All data was collected from public GitHub repositories and the GitHub REST API. Analysis code is available in the project repository:
+
+\begin{itemize}
+    \item \texttt{src/github\_fetcher/} -- API fetching modules
+    \item \texttt{analysis/contagion\_analysis.py} -- Main analysis code
+    \item \texttt{scripts/run\_simplified\_contagion.py} -- Pipeline runner
+\end{itemize}
+
+\section*{Acknowledgments}
+
+Data collection utilized 6 parallel GitHub API tokens to respect rate limits. Total data collection time was approximately 12 hours (4 hours for user repos, 8 hours for contributors).
+
+\end{document}

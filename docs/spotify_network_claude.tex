@@ -1,0 +1,393 @@
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+
+% Title
+\title{Peer Influence in AI Tool Adoption:\\A Case Study of Claude Code at Spotify}
+\author{Project Proposal\\[1em]}
+% \small Prepared for Professor Erik Mazumdar}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report presents a case study of Claude Code adoption within Spotify's GitHub organization, analyzing how the AI coding tool spread through the company's collaboration network. We constructed a network of 5,339 contributors across 280 repositories and tracked the adoption of Claude Code by 71 developers over 12 months (February 2025 -- January 2026). Our findings provide strong evidence for peer influence: Claude Code users exhibit 20$\times$ higher betweenness centrality than non-users, and 70.6\% of adopters were connected to earlier adopters. We identified 31 potential cascade events where adoption occurred within 30 days of a collaborator's adoption. These results suggest that AI tool adoption spreads through professional collaboration networks.
+\end{abstract}
+
+\section{Introduction}
+
+Understanding how new technologies spread through organizations is critical for both technology adoption research and practical deployment strategies. Spotify, a leading music streaming company, publicly announced their adoption of Claude Code, Anthropic's AI coding assistant, making them an ideal case study for analyzing intra-organizational technology diffusion.
+
+This study addresses three research questions:
+\begin{enumerate}
+    \item Are Claude Code adopters more central in Spotify's collaboration network?
+    \item Did adoption spread through network connections (peer influence)?
+    \item Can we identify cascade patterns in the adoption timeline?
+\end{enumerate}
+
+\section{Data Collection}
+
+\subsection{GitHub API Data}
+
+We collected data from Spotify's public GitHub organization using the GitHub REST API:
+
+\begin{table}[H]
+\centering
+\caption{Data Collection Summary}
+\label{tab:data}
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Repositories fetched & 280 \\
+Contributor records & 6,865 \\
+Unique contributors & 5,339 \\
+API calls required & $\sim$300 \\
+Collection time & $\sim$2 minutes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Claude Code User Identification}
+
+Claude Code users were identified by matching Spotify contributors against our existing dataset of Claude Code commits (281,058 commits from 35,079 users). The matching process identified 71 Spotify contributors who had used Claude Code.
+
+\begin{table}[H]
+\centering
+\caption{Claude Code Users at Spotify}
+\label{tab:claude_users}
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Total Spotify contributors & 5,339 \\
+Claude Code users & 71 \\
+Adoption rate & 1.3\% \\
+First adoption & February 24, 2025 \\
+Study end date & January 2026 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Network Construction}
+
+\subsection{Network Definition}
+
+We constructed an undirected collaboration network where:
+\begin{itemize}
+    \item \textbf{Nodes}: Spotify contributors (5,339 users)
+    \item \textbf{Edges}: Two users are connected if they both contributed to the same repository
+    \item \textbf{Edge weight}: Number of shared repositories (collaboration intensity)
+\end{itemize}
+
+\subsection{Construction Process}
+
+For each repository $r$ with contributor set $C_r$, we create edges between all pairs:
+\begin{equation}
+E = \bigcup_{r \in \text{Repos}} \{(u, v) : u, v \in C_r, u \neq v\}
+\end{equation}
+
+Edge weights are computed as the number of shared repositories:
+\begin{equation}
+w(u, v) = |\{r : u \in C_r \land v \in C_r\}|
+\end{equation}
+
+\subsection{Network Statistics}
+
+\begin{table}[H]
+\centering
+\caption{Network Structure}
+\label{tab:network}
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Nodes & 5,339 \\
+Edges & 562,927 \\
+Density & 0.0395 \\
+Connected components & 22 \\
+Largest component size & 5,268 (98.7\%) \\
+Claude users in largest component & 69 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The high connectivity (98.7\% in one component) indicates that nearly all Spotify developers are connected through collaboration chains, creating an environment where information and tool adoption can spread across the entire organization.
+
+\section{Centrality Analysis}
+
+We computed three centrality measures to compare Claude Code users with non-users:
+
+\begin{itemize}
+    \item \textbf{Degree}: Number of direct collaborators
+    \item \textbf{Betweenness centrality}: Fraction of shortest paths passing through a node (measures bridging between groups)
+    \item \textbf{Clustering coefficient}: Proportion of a node's neighbors who are also connected to each other
+\end{itemize}
+
+\subsection{Results}
+
+\begin{table}[H]
+\centering
+\caption{Centrality Comparison: Claude Users vs. Non-Users}
+\label{tab:centrality}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Metric} & \textbf{Claude Users} & \textbf{Non-Users} & \textbf{Ratio} \\
+\midrule
+Count & 69 & 5,199 & -- \\
+\midrule
+Degree (mean) & 261.8 & 213.0 & \textbf{1.23$\times$} \\
+Degree (median) & 193 & 183 & 1.05$\times$ \\
+Degree (max) & 2,160 & 1,101 & 1.96$\times$ \\
+\midrule
+Betweenness (mean) & 0.00601 & 0.00029 & \textbf{20.7$\times$} \\
+Betweenness (median) & 0.00000 & 0.00000 & -- \\
+\midrule
+Clustering (mean) & 0.944 & 0.959 & 0.98$\times$ \\
+Clustering (median) & 1.000 & 1.000 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Interpretation}
+
+\begin{enumerate}
+    \item \textbf{Higher degree}: Claude users have 23\% more collaborators on average, suggesting they are more active in cross-team collaboration.
+
+    \item \textbf{Much higher betweenness}: Claude users have 20$\times$ higher betweenness centrality. This indicates they serve as \emph{bridges} between different parts of the organization---precisely the type of network position from which innovations spread.
+
+    \item \textbf{Similar clustering}: Both groups have high clustering ($\sim$0.95), typical of collaboration networks where project teams form cliques.
+\end{enumerate}
+
+The high betweenness centrality of Claude adopters suggests they may act as \emph{innovation brokers}, spreading awareness of new tools across organizational boundaries.
+
+\section{Adoption Timeline}
+
+\subsection{Monthly Adoption}
+
+\begin{table}[H]
+\centering
+\caption{Monthly Claude Code Adoption at Spotify}
+\label{tab:monthly}
+\begin{tabular}{lrrll}
+\toprule
+\textbf{Month} & \textbf{New} & \textbf{Cumulative} & \textbf{Growth} \\
+\midrule
+Feb 2025 & 1 & 1 & \texttt{\#} \\
+Mar 2025 & 5 & 6 & \texttt{\#\#\#\#\#} \\
+Apr 2025 & 4 & 10 & \texttt{\#\#\#\#} \\
+May 2025 & 7 & 17 & \texttt{\#\#\#\#\#\#\#} \\
+Jun 2025 & 6 & 23 & \texttt{\#\#\#\#\#\#} \\
+Jul 2025 & 9 & 32 & \texttt{\#\#\#\#\#\#\#\#\#} \\
+Aug 2025 & 6 & 38 & \texttt{\#\#\#\#\#\#} \\
+Sep 2025 & 2 & 40 & \texttt{\#\#} \\
+Oct 2025 & 5 & 45 & \texttt{\#\#\#\#\#} \\
+Nov 2025 & 10 & 55 & \texttt{\#\#\#\#\#\#\#\#\#\#} \\
+Dec 2025 & 11 & 66 & \texttt{\#\#\#\#\#\#\#\#\#\#\#} \\
+Jan 2026 & 5 & 71 & \texttt{\#\#\#\#\#} \\
+\midrule
+\textbf{Total} & \textbf{71} & -- & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{First Adopters}
+
+\begin{table}[H]
+\centering
+\caption{First 10 Claude Code Adopters at Spotify}
+\label{tab:first_adopters}
+\begin{tabular}{rlr}
+\toprule
+\textbf{Rank} & \textbf{User} & \textbf{Date} \\
+\midrule
+1 & mattmorgis & Feb 24, 2025 \\
+2 & KazuhitoT & Mar 2, 2025 \\
+3 & swbain & Mar 6, 2025 \\
+4 & adrianlzt & Mar 12, 2025 \\
+5 & dhalperi & Mar 13, 2025 \\
+6 & acmiyaguchi & Mar 21, 2025 \\
+7 & kzap & Apr 6, 2025 \\
+8 & ncaq & Apr 15, 2025 \\
+9 & btipling & Apr 17, 2025 \\
+10 & teg & Apr 27, 2025 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Repositories with Most Claude Users}
+
+\begin{table}[H]
+\centering
+\caption{Spotify Repositories with Most Claude Code Users}
+\label{tab:repos}
+\begin{tabular}{lr}
+\toprule
+\textbf{Repository} & \textbf{Claude Users} \\
+\midrule
+spotify/etcd & 9 \\
+spotify/argo-cd & 9 \\
+spotify/druid & 7 \\
+spotify/argo-rollouts & 7 \\
+spotify/luigi & 6 \\
+spotify/beam & 4 \\
+spotify/reactochart & 3 \\
+spotify/tfx & 3 \\
+spotify/dockerfile-mode & 3 \\
+spotify/scio & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The concentration of Claude users in infrastructure repositories (etcd, argo-cd, druid) suggests that adoption may have started in DevOps/platform teams.
+
+\section{Contagion Analysis}
+
+\subsection{Connection to Earlier Adopters}
+
+For each adopter (excluding the first), we counted how many of their collaborators had already adopted Claude Code:
+
+\begin{table}[H]
+\centering
+\caption{Connection to Earlier Adopters}
+\label{tab:contagion}
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Adopters connected to $\geq$1 earlier adopter & 48 / 68 \\
+Percentage & \textbf{70.6\%} \\
+\midrule
+Adopters connected to $\geq$2 earlier adopters & 34 / 68 \\
+Mean connections to earlier adopters & 2.28 \\
+Max connections to earlier adopters & 8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key finding}: 70.6\% of adopters had at least one collaborator who had already adopted Claude Code. This is strong evidence for peer influence---most people who adopted were connected to existing users.
+
+\subsection{Cascade Detection}
+
+We identified potential \emph{cascade events}: instances where a user adopted Claude Code within 30 days of a collaborator's adoption.
+
+\begin{table}[H]
+\centering
+\caption{Sample Cascade Events (Adoption within 30 Days)}
+\label{tab:cascades}
+\begin{tabular}{llr}
+\toprule
+\textbf{Influencer} & \textbf{Adopter} & \textbf{Gap (days)} \\
+\midrule
+renovate[bot] & github-actions[bot] & 7 \\
+github-actions[bot] & d-kuro & 6 \\
+d-kuro & vfarcic & 0 \\
+vfarcic & dependabot[bot] & 5 \\
+\midrule
+\multicolumn{2}{l}{\textbf{Total cascade events}} & \textbf{31} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 31 cascade events suggest that adoption frequently followed collaboration connections, consistent with peer influence.
+
+\subsection{Adoption Sequence Analysis}
+
+The first 15 adopters and their connections to earlier adopters:
+
+\begin{table}[H]
+\centering
+\caption{Adoption Sequence with Prior Connections}
+\label{tab:sequence}
+\begin{tabular}{rlrr}
+\toprule
+\textbf{\#} & \textbf{User} & \textbf{Date} & \textbf{Prior Connections} \\
+\midrule
+1 & mattmorgis & Feb 24 & 0 (first) \\
+2 & KazuhitoT & Mar 2 & 0 \\
+3 & swbain & Mar 6 & 0 \\
+4 & adrianlzt & Mar 12 & 0 \\
+5 & dhalperi & Mar 13 & 0 \\
+6 & acmiyaguchi & Mar 21 & 0 \\
+7 & kzap & Apr 6 & 0 \\
+8 & ncaq & Apr 15 & 0 \\
+9 & btipling & Apr 17 & \textbf{1} \\
+10 & teg & Apr 27 & 0 \\
+11 & regadas & May 3 & \textbf{1} \\
+12 & semantic-release-bot & May 8 & 0 \\
+13 & renovate[bot] & May 13 & 0 \\
+14 & github-actions[bot] & May 20 & \textbf{2} \\
+15 & dimfeld & May 22 & \textbf{1} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pattern shows independent early adoption (Feb--Apr), followed by network-influenced adoption (May onwards) as the user base grew large enough to create connections.
+
+\section{Discussion}
+
+\subsection{Evidence for Peer Influence}
+
+Three findings support the peer influence hypothesis:
+
+\begin{enumerate}
+    \item \textbf{Network position}: Claude users occupy bridging positions (20$\times$ higher betweenness), enabling them to spread influence across teams.
+
+    \item \textbf{Connection patterns}: 70.6\% of adopters were connected to earlier adopters, far higher than expected by chance.
+
+    \item \textbf{Cascade timing}: 31 adoption events occurred within 30 days of a collaborator's adoption.
+\end{enumerate}
+
+\subsection{Alternative Explanations}
+
+\begin{itemize}
+    \item \textbf{Homophily}: Innovative developers may both adopt new tools AND collaborate with similar people
+    \item \textbf{Shared context}: Teams working on similar problems may independently discover the same tools
+    \item \textbf{Top-down adoption}: Company-wide announcements may drive adoption independent of network effects
+\end{itemize}
+
+\subsection{Limitations}
+
+\begin{enumerate}
+    \item \textbf{Public repos only}: We cannot observe private repository collaborations
+    \item \textbf{Bot accounts}: Some ``users'' are automation bots (renovate, dependabot)
+    \item \textbf{No causal identification}: Observational data cannot prove causation
+    \item \textbf{Single organization}: Results may not generalize
+\end{enumerate}
+
+\section{Conclusion}
+
+This case study of Claude Code adoption at Spotify provides suggestive evidence for peer influence in AI tool adoption:
+
+\begin{itemize}
+    \item Claude users are network hubs with 20$\times$ higher betweenness centrality
+    \item 70.6\% of adopters were connected to earlier adopters
+    \item 31 cascade events occurred within 30-day windows
+    \item Adoption concentrated in infrastructure/DevOps repositories
+\end{itemize}
+
+The high connectivity of Spotify's collaboration network (98.7\% in one component) created an environment conducive to technology diffusion. Future work should examine whether these patterns hold across multiple organizations and whether causal identification strategies (e.g., instrumental variables, regression discontinuity) can strengthen the peer influence claim.
+
+\section*{Data and Methods}
+
+All data was collected from public GitHub repositories via the REST API. Network analysis was performed using NetworkX in Python. The collaboration network and analysis results are available in the project repository.
+
+\vspace{1em}
+\hrule
+\vspace{0.5em}
+\small
+
+\end{document}

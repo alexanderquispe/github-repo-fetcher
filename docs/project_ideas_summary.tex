@@ -1,0 +1,404 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{multicol}
+
+\definecolor{primary}{RGB}{45, 55, 72}
+\definecolor{accent}{RGB}{66, 153, 225}
+
+\title{\textbf{AI Coding Tool Adoption: Complete Project Ideas Catalog}}
+\author{Network Science Project Planning Document}
+\date{February 2026}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Executive Summary}
+%==============================================================================
+
+This document catalogs all potential network science project directions using our unique dataset of 5+ million AI-assisted code contributions. The dataset captures adoption of four major AI coding tools across 600,000+ GitHub repositories from February 2025 to January 2026.
+
+\begin{tcolorbox}[colback=accent!10,colframe=accent,title=Dataset at a Glance]
+\begin{itemize}[noitemsep]
+    \item \textbf{5.08 million} AI-assisted contributions (commits + PRs)
+    \item \textbf{600,000+} unique repositories
+    \item \textbf{4 AI tools}: Claude Code, Copilot, Codex, Jules
+    \item \textbf{500,000+} estimated unique developers
+    \item \textbf{11 months} of temporal data
+\end{itemize}
+\end{tcolorbox}
+
+%==============================================================================
+\section{Core Network Science Concepts Applicable}
+%==============================================================================
+
+\subsection{Information Cascades \& Contagion}
+
+\begin{itemize}
+    \item \textbf{Independent Cascade Model}: Each ``infected'' developer has probability $p$ of infecting each neighbor
+    \item \textbf{Linear Threshold Model}: Developers adopt when fraction of adopting neighbors exceeds threshold $\theta$
+    \item \textbf{SIR/SIS Models}: Susceptible-Infected-Recovered dynamics for tool adoption
+    \item \textbf{Bass Diffusion}: Innovation adoption with internal (peer) and external (marketing) influence
+\end{itemize}
+
+\textbf{Application}: Model how Claude Code usage spreads from developer to developer through collaboration networks.
+
+\subsection{Social Influence vs. Homophily}
+
+\begin{itemize}
+    \item \textbf{Peer Effects}: Do developers adopt tools their collaborators use?
+    \item \textbf{Homophily}: Do similar developers (same language/domain) independently choose similar tools?
+    \item \textbf{Confounding}: Do shared environments (companies) drive both?
+\end{itemize}
+
+\textbf{Application}: Causal inference to separate influence from selection effects in AI tool adoption.
+
+\subsection{Network Centrality \& Influence}
+
+\begin{itemize}
+    \item \textbf{Degree Centrality}: Do highly connected developers adopt faster?
+    \item \textbf{Betweenness}: Do bridge developers spread tools across communities?
+    \item \textbf{PageRank}: Who are the influential early adopters?
+\end{itemize}
+
+\textbf{Application}: Identify which network positions predict early adoption.
+
+\subsection{Community Structure}
+
+\begin{itemize}
+    \item \textbf{Modularity-based Detection}: Louvain, Girvan-Newman
+    \item \textbf{Information-theoretic}: Infomap algorithm
+    \item \textbf{Overlapping Communities}: Developers belonging to multiple groups
+\end{itemize}
+
+\textbf{Application}: Do communities form around specific AI tools or programming languages?
+
+\subsection{Multiplex \& Multilayer Networks}
+
+\begin{itemize}
+    \item \textbf{Layer Correlation}: Same developers central across tools?
+    \item \textbf{Cross-layer Influence}: Does Copilot adoption predict Claude adoption?
+    \item \textbf{Layer Switching}: Migration patterns between tools
+\end{itemize}
+
+\textbf{Application}: Model the AI tool ecosystem as competing/complementary layers.
+
+\subsection{Temporal Network Dynamics}
+
+\begin{itemize}
+    \item \textbf{Burst Detection}: When do adoption events cluster?
+    \item \textbf{Temporal Motifs}: Patterns of sequential adoption
+    \item \textbf{Network Evolution}: How does the collaboration graph change?
+\end{itemize}
+
+\textbf{Application}: Analyze adoption dynamics over our 11-month window.
+
+\subsection{Bipartite Networks}
+
+\begin{itemize}
+    \item \textbf{Developer-Repository Graph}: Natural structure of our data
+    \item \textbf{One-mode Projections}: Developer-Developer and Repo-Repo networks
+    \item \textbf{Bipartite Community Detection}: Specialized algorithms
+\end{itemize}
+
+\textbf{Application}: The fundamental network structure connecting developers to codebases.
+
+%==============================================================================
+\section{Project Ideas: Full Catalog}
+%==============================================================================
+
+\subsection{Tier 1: Flagship Projects (Recommended)}
+
+\begin{tcolorbox}[colback=green!5,colframe=green!50!black,title=Project 1A: Information Cascades in AI Tool Adoption]
+\textbf{Research Question}: Does AI tool adoption spread through developer networks like a cascade?
+
+\textbf{Methodology}:
+\begin{enumerate}
+    \item Build collaboration network from shared repository contributions
+    \item Extract temporal adoption sequences for each tool
+    \item Fit Independent Cascade model; estimate transmission parameter $\beta$
+    \item Compare cascade sizes/depths across tools
+    \item Predict future adoptions from network state
+\end{enumerate}
+
+\textbf{Key Deliverables}:
+\begin{itemize}
+    \item Cascade tree visualizations
+    \item Calibrated epidemic model
+    \item Adoption prediction model
+\end{itemize}
+
+\textbf{Network Concepts}: Information cascades, SIR models, temporal networks
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=green!5,colframe=green!50!black,title=Project 1B: Influence vs. Homophily in Tool Selection]
+\textbf{Research Question}: Is tool clustering due to peer influence or similar developers making similar choices?
+
+\textbf{Methodology}:
+\begin{enumerate}
+    \item Temporal regression: Does neighbor adoption at $t-1$ predict own adoption at $t$?
+    \item Matched pair design: Compare exposed vs. unexposed developers
+    \item Network randomization: Permutation tests preserving structure
+\end{enumerate}
+
+\textbf{Key Deliverables}:
+\begin{itemize}
+    \item Decomposition of influence vs. homophily contributions
+    \item Comparison across tools (which shows strongest network effects?)
+    \item Causal inference framework for technology adoption
+\end{itemize}
+
+\textbf{Network Concepts}: Peer effects, causal inference, homophily
+\end{tcolorbox}
+
+\subsection{Tier 2: Strong Alternatives}
+
+\begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,title=Project 2A: Influence Maximization for Developer Outreach]
+\textbf{Research Question}: Which $k$ developers should be targeted to maximize adoption through network effects?
+
+\textbf{Methodology}:
+\begin{enumerate}
+    \item Implement greedy influence maximization (Kempe et al. 2003)
+    \item Compare with degree, PageRank, and betweenness heuristics
+    \item Validate on historical data: Did actual early adopters maximize spread?
+\end{enumerate}
+
+\textbf{Key Deliverables}:
+\begin{itemize}
+    \item Ranked list of influential developers for each tool
+    \item Algorithm comparison and recommendations
+    \item Expected ROI from targeted outreach
+\end{itemize}
+
+\textbf{Network Concepts}: Influence maximization, centrality, viral marketing
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,title=Project 2B: Multi-Tool Ecosystem as Multiplex Network]
+\textbf{Research Question}: How do developers navigate competing AI tools? Does adopting one predict adopting/rejecting others?
+
+\textbf{Methodology}:
+\begin{enumerate}
+    \item Link developers across tool datasets
+    \item Build multiplex network with one layer per tool
+    \item Compute layer correlations and cross-layer influence
+    \item Model tool switching as Markov process
+\end{enumerate}
+
+\textbf{Key Deliverables}:
+\begin{itemize}
+    \item Tool ecosystem map with migration flows
+    \item Transition probability matrix
+    \item Market share predictions
+    \item Developer segmentation (loyalists vs. explorers)
+\end{itemize}
+
+\textbf{Network Concepts}: Multiplex networks, layer correlation, Markov chains
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,title=Project 2C: Community Detection and Tool Preference Clustering]
+\textbf{Research Question}: Do distinct communities form around different AI tools?
+
+\textbf{Methodology}:
+\begin{enumerate}
+    \item Project bipartite graph to developer-developer network
+    \item Apply Louvain, Infomap, label propagation
+    \item Characterize communities by language, topics, location
+    \item Correlate community membership with tool preference
+\end{enumerate}
+
+\textbf{Key Deliverables}:
+\begin{itemize}
+    \item Community map colored by dominant tool
+    \item Community profiles (characteristics)
+    \item Predictive model: community $\rightarrow$ tool adoption
+\end{itemize}
+
+\textbf{Network Concepts}: Community detection, modularity, bipartite networks
+\end{tcolorbox}
+
+\subsection{Tier 3: Focused Studies}
+
+\begin{tcolorbox}[colback=yellow!5,colframe=yellow!50!black,title=Project 3A: Geographic Diffusion of AI Tools]
+\textbf{Research Question}: How does adoption spread geographically? Are there regional leader-follower dynamics?
+
+\textbf{Method}: Spatial network from cross-region collaborations; spatial epidemic model.
+
+\textbf{Deliverables}: Animated world map of adoption spread; regional adoption curves.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=yellow!5,colframe=yellow!50!black,title=Project 3B: Programming Language Networks and Tool Preference]
+\textbf{Research Question}: Do Python developers prefer different tools than JavaScript developers?
+
+\textbf{Method}: Build language co-occurrence network; correlate with tool adoption rates.
+
+\textbf{Deliverables}: Language-tool affinity matrix; cross-language diffusion analysis.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=yellow!5,colframe=yellow!50!black,title=Project 3C: Repository Adoption Dynamics]
+\textbf{Research Question}: What predicts whether a repository will adopt AI tools?
+
+\textbf{Method}: Repository feature analysis (stars, forks, language, age); network of related repos.
+
+\textbf{Deliverables}: Adoption prediction model; repository characteristics associated with AI usage.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=yellow!5,colframe=yellow!50!black,title=Project 3D: Temporal Burst Analysis]
+\textbf{Research Question}: When do AI tool adoption events cluster in time? Are there triggering events?
+
+\textbf{Method}: Burst detection algorithms; correlation with external events (releases, announcements).
+
+\textbf{Deliverables}: Timeline of adoption bursts; event-adoption correlation analysis.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=yellow!5,colframe=yellow!50!black,title=Project 3E: Bot vs. Human Collaboration Networks]
+\textbf{Research Question}: How does AI (as a ``collaborator'') change the structure of development networks?
+
+\textbf{Method}: Compare pre/post AI tool adoption network metrics; treat AI as pseudo-node.
+
+\textbf{Deliverables}: Network structural changes from AI integration; human-AI collaboration patterns.
+\end{tcolorbox}
+
+\subsection{Tier 4: Advanced/Experimental}
+
+\begin{tcolorbox}[colback=red!5,colframe=red!50!black,title=Project 4A: Game-Theoretic Model of Tool Competition]
+\textbf{Research Question}: Can we model AI tool adoption as a coordination game on networks?
+
+\textbf{Method}: Network games with switching costs; equilibrium analysis.
+
+\textbf{Deliverables}: Game-theoretic model; predicted equilibrium market shares.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=red!5,colframe=red!50!black,title=Project 4B: Link Prediction for Future Collaborations]
+\textbf{Research Question}: Can AI tool co-usage predict future collaborations?
+
+\textbf{Method}: Link prediction using tool adoption as features.
+
+\textbf{Deliverables}: Link prediction model; analysis of tool-collaboration relationship.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=red!5,colframe=red!50!black,title=Project 4C: Network Embedding for Developer Similarity]
+\textbf{Research Question}: Can we learn developer embeddings that capture tool preferences?
+
+\textbf{Method}: Node2Vec, GraphSAGE on collaboration network.
+
+\textbf{Deliverables}: Developer embeddings; visualization of tool preference clusters in embedding space.
+\end{tcolorbox}
+
+%==============================================================================
+\section{Recommended Project Combinations}
+%==============================================================================
+
+\subsection{Option A: Cascade Focus (Theoretical + Empirical)}
+
+\begin{enumerate}
+    \item \textbf{Project 1A} (Cascades) as primary
+    \item \textbf{Project 2A} (Influence Maximization) as secondary
+\end{enumerate}
+
+\textbf{Story}: ``We model how AI tools spread through networks, then identify optimal seed developers.''
+
+\subsection{Option B: Causal Inference Focus (Methodological)}
+
+\begin{enumerate}
+    \item \textbf{Project 1B} (Influence vs. Homophily) as primary
+    \item \textbf{Project 3A} (Geographic) as secondary
+\end{enumerate}
+
+\textbf{Story}: ``We rigorously identify peer influence effects, then analyze geographic dimensions.''
+
+\subsection{Option C: Ecosystem Focus (Multi-Tool)}
+
+\begin{enumerate}
+    \item \textbf{Project 2B} (Multiplex) as primary
+    \item \textbf{Project 2C} (Communities) as secondary
+\end{enumerate}
+
+\textbf{Story}: ``We map the AI tool ecosystem and identify distinct developer communities.''
+
+%==============================================================================
+\section{Technical Implementation Notes}
+%==============================================================================
+
+\subsection{Network Construction}
+
+\textbf{Developer Collaboration Network}:
+\begin{verbatim}
+# Pseudocode
+for each repository R:
+    devs = developers who contributed to R
+    for each pair (d1, d2) in devs:
+        G.add_edge(d1, d2, weight=1)  # or increment weight
+\end{verbatim}
+
+\textbf{Edge weights}: Number of shared repos, or recency-weighted.
+
+\subsection{Temporal Analysis}
+
+\textbf{Adoption time extraction}:
+\begin{verbatim}
+adoption_time[dev] = min(commit_date) for commits by dev using tool
+\end{verbatim}
+
+\textbf{Cascade reconstruction}: For each adopter, assign ``parent'' as the neighbor who adopted most recently before them.
+
+\subsection{Key Libraries}
+
+\begin{itemize}
+    \item \texttt{networkx} or \texttt{igraph}: Graph operations
+    \item \texttt{ndlib}: Epidemic/cascade simulations
+    \item \texttt{community} (python-louvain): Community detection
+    \item \texttt{geopandas}: Geographic analysis
+    \item \texttt{pyvis} or \texttt{gephi}: Visualization
+\end{itemize}
+
+%==============================================================================
+\section{Quick Reference: Network Metrics to Compute}
+%==============================================================================
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Metric} & \textbf{Interpretation} \\
+\midrule
+Degree & Number of collaborators \\
+Clustering coefficient & Local cliquishness \\
+Betweenness centrality & Bridge position \\
+PageRank & Influence/importance \\
+Modularity & Community structure quality \\
+Average path length & Network compactness \\
+Giant component size & Network connectivity \\
+Assortativity & Degree correlation \\
+\bottomrule
+\end{tabular}
+\caption{Standard network metrics for developer collaboration graph}
+\end{table}
+
+%==============================================================================
+\section{References}
+%==============================================================================
+
+\begin{enumerate}
+    \item Kempe, Kleinberg, \& Tardos (2003). ``Maximizing the spread of influence.'' KDD.
+    \item Aral, Muchnik, \& Sundararajan (2009). ``Distinguishing influence from homophily.'' PNAS.
+    \item Centola (2010). ``Spread of behavior in online social networks.'' Science.
+    \item Bakshy et al. (2012). ``Role of social networks in information diffusion.'' WWW.
+    \item Leskovec et al. (2007). ``Dynamics of viral marketing.'' TWEB.
+    \item Rogers (1962). \textit{Diffusion of Innovations}. Free Press.
+    \item Watts \& Strogatz (1998). ``Collective dynamics of small-world networks.'' Nature.
+    \item Barabasi \& Albert (1999). ``Emergence of scaling in random networks.'' Science.
+\end{enumerate}
+
+\end{document}

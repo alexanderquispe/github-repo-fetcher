@@ -1,0 +1,143 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{setspace}
+
+% Compact spacing
+\setlength{\parskip}{0.5em}
+\setlist{noitemsep,topsep=0pt}
+
+\title{\vspace{-2em}\textbf{CS 145 Project Proposals: Network Dynamics of AI Coding Tool Adoption}\vspace{-1em}}
+\author{Team: [Your Name], [Partner 1], [Partner 2]}
+\date{March 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+%==============================================================================
+% PROPOSAL 1
+%==============================================================================
+\section*{Proposal 1: Cascade Effects in AI Coding Tool Adoption}
+
+\subsection*{The Idea}
+
+We propose modeling AI coding tool adoption (Claude Code, GitHub Copilot, OpenAI Codex) as an \textbf{information cascade} through GitHub's developer collaboration network. When developers observe their collaborators successfully using AI coding assistants, they may be more likely to adopt these tools themselves---creating cascade dynamics similar to viral phenomena in social networks.
+
+Our core research question: \textit{Does AI tool adoption spread through developer networks like an epidemic, and can we predict which developers will adopt based on their network position?}
+
+We construct a \textbf{developer collaboration graph} $G = (V, E)$ where nodes are developers and edges connect those who contribute to shared repositories. Using timestamped adoption data from 5+ million AI-assisted commits across 600,000 repositories, we will:
+
+\begin{enumerate}
+    \item Reconstruct temporal adoption sequences for each AI tool
+    \item Build cascade trees showing how adoption propagated through the network
+    \item Fit Independent Cascade and Linear Threshold models to estimate transmission parameters
+    \item Predict future adoptions based on current network state
+\end{enumerate}
+
+\subsection*{Motivation}
+
+Understanding cascade dynamics in technology adoption has both theoretical and practical significance:
+
+\begin{itemize}
+    \item \textbf{Network Science}: Extends cascade models to a novel domain---professional developer networks---where ``infection'' represents tool adoption rather than information spread
+    \item \textbf{Industry Applications}: AI companies can identify influential developers to seed adoption; organizations can predict which teams will adopt AI tools
+    \item \textbf{Research Contribution}: First large-scale empirical analysis of how AI coding assistants spread through GitHub's collaboration network
+\end{itemize}
+
+The network perspective explains \textit{why} certain developers adopt faster than others, going beyond aggregate adoption curves.
+
+\subsection*{End Product}
+
+\begin{enumerate}
+    \item \textbf{Interactive Visualization}: Cascade trees showing adoption spread for each AI tool
+    \item \textbf{Calibrated Model}: Independent Cascade model with empirically estimated transmission rates ($\beta$) for each tool; comparison of cascade sizes and depths across tools
+    \item \textbf{Predictive Analysis}: Identify developers in ``high-risk'' network positions likely to adopt within 6 months
+    \item \textbf{Research Paper}: Empirical analysis comparing cascade dynamics across Claude, Copilot, Codex, and Jules
+\end{enumerate}
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+%==============================================================================
+% PROPOSAL 2
+%==============================================================================
+\section*{Proposal 2: Disentangling Influence from Homophily in AI Tool Selection}
+
+\subsection*{The Idea}
+
+When two collaborating developers both use Claude Code, is it because one \textit{influenced} the other to adopt, or because similar developers independently make similar choices (\textit{homophily})? This is the fundamental identification problem in network analysis.
+
+We propose applying rigorous causal inference techniques to our AI tool adoption dataset to decompose observed clustering into:
+\begin{itemize}
+    \item \textbf{Social Influence}: Developer $j$ adopts because neighbor $i$ convinced them
+    \item \textbf{Homophily}: Developers with similar characteristics (language, domain) independently choose similar tools
+    \item \textbf{Confounding}: Shared environment (same company, same open source project) drives both
+\end{itemize}
+
+Our methodology combines three identification strategies:
+
+\begin{enumerate}
+    \item \textbf{Temporal Analysis}: If influence is causal, neighbor adoption at $t-1$ predicts own adoption at $t$, controlling for covariates (programming language, repository topics, account age)
+    \item \textbf{Matched Pair Design}: Compare adoption rates between developers exposed to adopting neighbors vs. matched controls without such exposure
+    \item \textbf{Network Randomization}: Permutation tests that preserve network structure and marginal adoption rates to assess whether observed clustering exceeds chance
+\end{enumerate}
+
+\subsection*{Motivation}
+
+This distinction has profound implications for technology diffusion strategy:
+\begin{itemize}
+    \item If \textbf{influence dominates}: Targeting network hubs can accelerate adoption exponentially
+    \item If \textbf{homophily dominates}: Marketing should focus on developer segments rather than network position
+    \item Understanding the mechanism enables better prediction of future technology waves
+\end{itemize}
+
+This project applies cutting-edge network causal inference methods (Aral et al. 2009, Shalizi \& Thomas 2011) to a timely domain with unique data.
+
+\subsection*{End Product}
+
+\begin{enumerate}
+    \item \textbf{Decomposition}: Quantify the relative contributions of influence vs. homophily for each AI tool (e.g., ``60\% of Claude adoption clustering is attributable to peer influence'')
+    \item \textbf{Tool Comparison}: Which tool shows strongest network effects? (Hypothesis: Claude Code, due to visible co-author attribution in commits)
+    \item \textbf{Visualization}: Network diagrams with nodes colored by adoption source (influenced vs. independent)
+    \item \textbf{Strategic Recommendations}: Evidence-based guidance for AI tool adoption strategies
+\end{enumerate}
+
+\vspace{1em}
+\hrule
+\vspace{0.5em}
+
+%==============================================================================
+% DATA SUMMARY
+%==============================================================================
+\section*{Data Available}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrl}
+\toprule
+\textbf{Tool} & \textbf{Events} & \textbf{Repos} & \textbf{Detection} \\
+\midrule
+Claude Code & 281K commits & 439K & Co-author trailer \\
+GitHub Copilot & 1.08M PRs & 247K & \texttt{copilot/} branch \\
+OpenAI Codex & 3.09M PRs & 249K & \texttt{codex/} branch \\
+Google Jules & 622K commits & 70K & Bot author \\
+\midrule
+\textbf{Total} & \textbf{5.08M} & \textbf{$\sim$600K} & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Data includes: developer usernames, timestamps, repository metadata (language, topics, stars), and owner location for geographic analysis. Collected Feb 2025--Jan 2026.
+
+\end{document}
